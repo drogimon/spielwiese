@@ -1,0 +1,30 @@
+/* Platzhalter für Phase 1 – die Pixel-Wiese folgt in Phase 2 */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(#87ceeb 0 60%, #5aa83c 60% 100%);
+  color: #1d2b12;
+  font-family: system-ui, sans-serif;
+}
+
+.platzhalter {
+  text-align: center;
+  padding: 2rem 3rem;
+  background: #c8915a;
+  border: 4px solid #6b4423;
+  box-shadow: 6px 6px 0 #0004;
+}
+
+h1 {
+  margin: 0 0 .5rem;
+  font-size: 3rem;
+}
+
+.hinweis { opacity: .8; }
