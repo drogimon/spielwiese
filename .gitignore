@@ -1,0 +1,21 @@
+# Abhängigkeiten
+node_modules/
+
+# Build-Ausgaben
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Signaturschlüssel – niemals einchecken
+*.key
+*.key.pub
+.tauri/
+
+# Umgebung und Editor
+.env
+.env.*
+.vscode/
+.idea/
+*.log
+Thumbs.db
+desktop.ini
