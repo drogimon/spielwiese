@@ -96,21 +96,25 @@ addEventListener('resize', () => {
 
 // ---------- Bestleistungen (lokal gespeichert) ----------
 
+// Gespeichert wird je Spiel ein Objekt { "<stufe>": { wert, text } }; ohne Stufe ist der Schlüssel "".
 const speicherSchluessel = kennung => `spielwiese:bestleistung:${kennung}`;
 
-function bestleistungLesen(kennung) {
-  try { return JSON.parse(localStorage.getItem(speicherSchluessel(kennung))); }
-  catch { return null; }
+function bestleistungenLesen(kennung) {
+  try { return JSON.parse(localStorage.getItem(speicherSchluessel(kennung))) ?? {}; }
+  catch { return {}; }
 }
 
-function ergebnisMelden(spiel, { wert, text }) {
+function ergebnisMelden(spiel, { wert, text, stufe }) {
   if (typeof wert !== 'number' || !Number.isFinite(wert)) return;
-  const bisher = bestleistungLesen(spiel.kennung);
+  const name = typeof stufe === 'string' ? stufe.slice(0, 40) : '';
+  const alle = bestleistungenLesen(spiel.kennung);
+  const bisher = alle[name];
   const kleinerIstBesser = spiel.bestleistung === 'kleiner';
   const besser = !bisher || (kleinerIstBesser ? wert < bisher.wert : wert > bisher.wert);
   if (!besser) return;
+  alle[name] = { wert, text: String(text ?? wert).slice(0, 40) };
   try {
-    localStorage.setItem(speicherSchluessel(spiel.kennung), JSON.stringify({ wert, text: String(text ?? wert) }));
+    localStorage.setItem(speicherSchluessel(spiel.kennung), JSON.stringify(alle));
   } catch { /* Speicher nicht verfügbar – dann eben ohne Rekord */ }
   schildAktualisieren(spiel);
 }
@@ -143,11 +147,15 @@ function schildErstellen(spiel) {
 }
 
 function schildAktualisieren(spiel) {
-  const rekord = bestleistungLesen(spiel.kennung);
   const feld = schilder.get(spiel.kennung)?.querySelector('.schild-rekord');
   if (!feld) return;
-  feld.hidden = !rekord;
-  if (rekord) feld.textContent = `🏆 ${rekord.text}`;
+  const eintraege = Object.entries(bestleistungenLesen(spiel.kennung));
+  feld.hidden = eintraege.length === 0;
+  feld.replaceChildren(...eintraege.map(([stufe, { text }]) => {
+    const zeile = document.createElement('span');
+    zeile.textContent = stufe ? `🏆 ${stufe}: ${text}` : `🏆 ${text}`;
+    return zeile;
+  }));
 }
 
 function hinweisSchild(symbol, name, text) {

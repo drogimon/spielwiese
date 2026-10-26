@@ -40,6 +40,7 @@ window.parent.postMessage({ typ: 'spielwiese:ergebnis', wert: 83, text: '1:23' }
 
 - `wert`: Zahl zum Vergleichen
 - `text`: so wird es auf dem Schild angezeigt
+- `stufe` (optional): Name der Schwierigkeitsstufe. Jede Stufe hat ihre eigene Bestleistung, z. B. `stufe: 'Viele'`.
 
 Außerhalb der Spielwiese (Spiel direkt im Browser geöffnet) passiert dabei einfach nichts.
 
