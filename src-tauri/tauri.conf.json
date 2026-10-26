@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "identifier": "io.github.drogimon.spielwiese",
   "build": {
-    "frontendDist": "../src"
+    "frontendDist": "../src",
+    "beforeDevCommand": { "script": "node scripts/spiele-liste.mjs", "wait": true },
+    "beforeBuildCommand": "node scripts/spiele-liste.mjs"
   },
   "app": {
     "withGlobalTauri": true,

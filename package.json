@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "vorschau": "node scripts/spiele-liste.mjs && node scripts/vorschau.mjs"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.12.4"

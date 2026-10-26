@@ -5,6 +5,7 @@ node_modules/
 dist/
 src-tauri/target/
 src-tauri/gen/schemas/
+src/spiele/liste.json
 
 # Signaturschlüssel – niemals einchecken
 *.key
@@ -12,6 +13,7 @@ src-tauri/gen/schemas/
 .tauri/
 
 # Umgebung und Editor
+.claude/settings.local.json
 .env
 .env.*
 .vscode/

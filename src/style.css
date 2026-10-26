@@ -1,30 +1,260 @@
-/* Platzhalter für Phase 1 – die Pixel-Wiese folgt in Phase 2 */
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('assets/schrift/pixelify-sans-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('assets/schrift/pixelify-sans-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-display: block;
+}
+
+:root {
+  --holz-hell: #c98f55;
+  --holz: #b07841;
+  --holz-fuge: #8e5a2c;
+  --holz-rand: #4a2c14;
+  --pfosten: #7a4d26;
+  --schrift-holz: #3a220e;
+  --schatten: rgb(0 0 0 / .28);
+  --px: 4px;
+  /* wird vom Launcher passend zur Tageszeit gesetzt (0 = Tag, ~0.65 = Nacht) */
+  --dunkel: 0;
+}
+
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
+  background: #0b1030;
+  font-family: 'Pixelify Sans', system-ui, sans-serif;
+  color: var(--schrift-holz);
+  user-select: none;
+}
+
+button { font: inherit; color: inherit; }
+
+.unsichtbar {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip-path: inset(50%);
+}
+
+#wiese {
+  position: fixed;
+  inset: 0;
+  image-rendering: pixelated;
+}
+
+/* Holz-Optik mit ausgesparten Ecken, wie aus Pixeln gebaut */
+.holz {
+  background:
+    repeating-linear-gradient(to bottom, var(--holz-hell) 0 calc(var(--px) * 5), var(--holz) 0 calc(var(--px) * 9), var(--holz-fuge) 0 calc(var(--px) * 10));
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--holz-rand),
+    0 var(--px) 0 0 var(--holz-rand),
+    calc(var(--px) * -1) 0 0 0 var(--holz-rand),
+    var(--px) 0 0 0 var(--holz-rand),
+    calc(var(--px) * 2) calc(var(--px) * 3) 0 0 var(--schatten);
+  filter: brightness(calc(1 - var(--dunkel) * .7)) saturate(calc(1 - var(--dunkel) * .4));
+  transition: filter 1.5s;
+}
+
+/* ---------- Kopf ---------- */
+
+.kopf {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 28px;
+  pointer-events: none;
+}
+.kopf > * { pointer-events: auto; }
+
+.titelschild {
+  margin: 0;
+  padding: 10px 26px 12px;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: #fff3d6;
+  text-shadow: 3px 3px 0 var(--holz-rand);
+}
+
+.tageszeit {
+  padding: 8px 14px;
+  border: 0;
+  background: rgb(10 14 40 / .45);
+  color: #fff;
+  font-size: 18px;
+  box-shadow: 0 -3px 0 0 rgb(10 14 40 / .45), 0 3px 0 0 rgb(10 14 40 / .45), -3px 0 0 0 rgb(10 14 40 / .45), 3px 0 0 0 rgb(10 14 40 / .45);
+  cursor: pointer;
+  text-shadow: 2px 2px 0 rgb(0 0 0 / .4);
+}
+.tageszeit:hover { background: rgb(10 14 40 / .65); }
+
+/* ---------- Schilder ---------- */
+
+.schilder {
+  position: fixed;
+  left: 0; right: 0;
+  top: 60%;
+  bottom: 3%;
+  margin: 0;
+  padding: 0 32px;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 28px 48px;
+  overflow-y: auto;
+}
+
+.schild {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.schild-brett {
+  position: relative;
   display: grid;
-  place-items: center;
-  background: linear-gradient(#87ceeb 0 60%, #5aa83c 60% 100%);
-  color: #1d2b12;
-  font-family: system-ui, sans-serif;
+  justify-items: center;
+  gap: 2px;
+  min-width: 220px;
+  max-width: 280px;
+  padding: 14px 22px 16px;
+  color: var(--schrift-holz);
 }
 
-.platzhalter {
+/* Nägel */
+.schild-brett::before,
+.schild-brett::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  width: var(--px); height: var(--px);
+  background: var(--holz-rand);
+}
+.schild-brett::before { left: 10px; }
+.schild-brett::after { right: 10px; }
+
+.schild-pfosten {
+  width: 20px;
+  height: 40px;
+  background: var(--pfosten);
+  box-shadow: inset -4px 0 0 rgb(0 0 0 / .25), 2px 3px 0 var(--schatten);
+  filter: brightness(calc(1 - var(--dunkel) * .7));
+  transition: filter 1.5s;
+}
+
+.schild-symbol {
+  font-size: 44px;
+  line-height: 1.1;
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / .25));
+}
+
+.schild-name {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.schild-beschreibung {
+  font-size: 14px;
+  line-height: 1.2;
   text-align: center;
-  padding: 2rem 3rem;
-  background: #c8915a;
-  border: 4px solid #6b4423;
-  box-shadow: 6px 6px 0 #0004;
+  opacity: .85;
 }
 
-h1 {
-  margin: 0 0 .5rem;
-  font-size: 3rem;
+.schild-rekord {
+  margin-top: 4px;
+  padding: 1px 8px;
+  font-size: 14px;
+  background: rgb(58 34 14 / .18);
 }
 
-.hinweis { opacity: .8; }
+.schild:hover .schild-brett,
+.schild:focus-visible .schild-brett {
+  animation: wackeln .5s steps(4) infinite;
+}
+.schild:focus-visible { outline: none; }
+.schild:focus-visible .schild-brett {
+  outline: 4px dashed #fff8d0;
+  outline-offset: 8px;
+}
+
+@keyframes wackeln {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-1.5deg) translateY(-2px); }
+  75% { transform: rotate(1.5deg) translateY(-2px); }
+}
+
+.schild-leer { cursor: default; }
+.schild-leer:hover .schild-brett { animation: none; }
+
+/* ---------- Spielbühne ---------- */
+
+.spielbuehne {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+.spielbuehne[hidden] { display: none; }
+
+.spielleiste {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 44px;
+  padding: 0 12px;
+  background: #2c4a22;
+  border-bottom: 4px solid #1b3014;
+  color: #f4ecd0;
+}
+
+.zurueck {
+  padding: 4px 12px;
+  border: 0;
+  background: #5aa83c;
+  color: #10240a;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 -3px 0 0 #1b3014, 0 3px 0 0 #1b3014, -3px 0 0 0 #1b3014, 3px 0 0 0 #1b3014;
+  cursor: pointer;
+}
+.zurueck:hover, .zurueck:focus-visible { background: #7cc95a; outline: none; }
+
+.spieltitel {
+  font-size: 18px;
+  opacity: .9;
+}
+
+.spielrahmen {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schild:hover .schild-brett,
+  .schild:focus-visible .schild-brett { animation: none; transform: translateY(-3px); }
+  .holz, .schild-pfosten { transition: none; }
+}

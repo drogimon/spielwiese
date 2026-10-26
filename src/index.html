@@ -7,11 +7,26 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="platzhalter">
-    <h1>Spielwiese</h1>
-    <p id="tageszeit"></p>
-    <p class="hinweis">Hier wächst bald die Wiese. 🌱</p>
+  <canvas id="wiese" aria-hidden="true"></canvas>
+
+  <header class="kopf">
+    <h1 class="titelschild holz">Spielwiese</h1>
+    <button id="tageszeit" class="tageszeit" type="button" title="Tageszeit zum Testen umschalten (Taste Z)"></button>
+  </header>
+
+  <main>
+    <h2 class="unsichtbar">Spiele</h2>
+    <ul id="schilder" class="schilder"></ul>
   </main>
-  <script src="launcher.js"></script>
+
+  <section id="spielbuehne" class="spielbuehne" hidden aria-labelledby="spieltitel">
+    <div class="spielleiste">
+      <button id="zurueck" class="zurueck" type="button" title="Zurück zur Wiese (Esc)">🌿 Zurück zur Wiese</button>
+      <span id="spieltitel" class="spieltitel"></span>
+    </div>
+    <iframe id="spielrahmen" class="spielrahmen" title="Spiel"></iframe>
+  </section>
+
+  <script type="module" src="launcher.js"></script>
 </body>
 </html>
