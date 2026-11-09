@@ -87,7 +87,6 @@ export function erstelleWiese(canvas) {
       x: 2 + Math.floor(r() * (B - 4)),
       y: bodenY + 6 + Math.floor(r() * (H - bodenY - 6)),
       farbe: hexZuRgb(BLUMENFARBEN[Math.floor(r() * BLUMENFARBEN.length)]),
-      phase: r() * 6.28,
     })).sort((a, b) => a.y - b.y);
 
     sterne = Array.from({ length: Math.round(B * horizont / 140) }, () => ({
@@ -281,6 +280,7 @@ export function erstelleWiese(canvas) {
   }
 
   function zeichnen(stunde, zeit, dt) {
+    if (!B || !H) return; // Fenster minimiert oder (noch) ohne Größe
     const p = paletteFuer(stunde);
     himmelZeichnen(p);
     ctx.drawImage(himmelCanvas, 0, 0);

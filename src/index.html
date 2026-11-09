@@ -19,9 +19,19 @@
     <ul id="schilder" class="schilder"></ul>
   </main>
 
+  <aside id="update" class="update holz" hidden aria-live="polite">
+    <p id="update-text" class="update-text"></p>
+    <div class="update-knoepfe">
+      <button id="update-ja" class="knopf" type="button">Jetzt aktualisieren</button>
+      <button id="update-spaeter" class="knopf knopf-leise" type="button">Später</button>
+    </div>
+  </aside>
+
+  <footer id="version" class="version"></footer>
+
   <section id="spielbuehne" class="spielbuehne" hidden aria-labelledby="spieltitel">
     <div class="spielleiste">
-      <button id="zurueck" class="zurueck" type="button" title="Zurück zur Wiese (Esc)">🌿 Zurück zur Wiese</button>
+      <button id="zurueck" class="knopf zurueck" type="button" title="Zurück zur Wiese (Esc)">🌿 Zurück zur Wiese</button>
       <span id="spieltitel" class="spieltitel"></span>
     </div>
     <iframe id="spielrahmen" class="spielrahmen" title="Spiel"></iframe>

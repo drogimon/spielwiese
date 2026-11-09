@@ -6,53 +6,114 @@
 <title>Many Mines</title>
 <style>
   :root {
-    --bg: #1e2228;
-    --panel: #2a2f37;
-    --text: #e8eaed;
-    --hidden: #4a5361;
-    --hidden-hover: #5a6576;
-    --open: #c9cdd3;
-    --mine-bg: #e5534b;
-    --wrong: #8a4a4a;
-    --accent: #6cb6ff;
+    --text: #f3e9ff;
+    --muted: #c3b0ef;
+    --cyan: #2ee6ff;
+    --pink: #ff3fd0;
+    --hidden: #3a1a6a;
+    --hidden-hover: #4d2490;
+    --open: #160a2e;
+    --mine-bg: #ff2a6d;
+    --wrong: #5c1640;
+    --horizont: 62%;
   }
   * { box-sizing: border-box; }
+  html { background: #0b0221; }
   body {
     margin: 0; min-height: 100vh; color: var(--text);
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.05' stroke-width='1.5'%3E%3Ccircle cx='30' cy='30' r='7'/%3E%3Cpath d='M30 19v-4M30 41v4M19 30h-4M41 30h4M22 22l-3-3M38 38l3 3M22 38l-3 3M38 22l3-3'/%3E%3Cpath d='M86 96V74l12 5-12 5'/%3E%3Cpath d='M80 96h12'/%3E%3C/g%3E%3C/svg%3E"),
-      radial-gradient(900px 600px at 15% 10%, #2b4a6e 0%, transparent 65%),
-      radial-gradient(900px 600px at 90% 95%, #4a2f66 0%, transparent 65%),
-      linear-gradient(160deg, #1f2b3d 0%, #252238 100%);
-    background-attachment: fixed;
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 24px 16px;
     user-select: none; -webkit-user-select: none;
   }
-  h1 {
-    margin: 0 0 4px; font-size: 34px; font-weight: 800; letter-spacing: 1px;
-    background: linear-gradient(90deg, #8fc8ff, #c3a6ff);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+
+  /* ---------- Hintergrund: Nachthimmel, Retro-Sonne, Berge, Neon-Gitter ---------- */
+  .szene {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    background:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 27% 8%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 41% 30%, #ffd9f7 50%, transparent 51%),
+      radial-gradient(1px 1px at 58% 12%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 73% 24%, #d9f7ff 50%, transparent 51%),
+      radial-gradient(1px 1px at 86% 9%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 93% 34%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 5% 40%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 34% 46%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 66% 44%, #fff 50%, transparent 51%),
+      linear-gradient(to bottom, #0b0221 0%, #1d0640 35%, #4a0d62 var(--horizont), #12021f var(--horizont));
   }
-  .subtitle { margin: 0 0 20px; font-size: 14px; opacity: .55; }
+  .sonne {
+    position: absolute; left: 50%;
+    width: min(64vh, 540px); aspect-ratio: 1;
+    top: calc(var(--horizont) - min(64vh, 540px) * .62);
+    clip-path: inset(0 0 38% 0); /* endet am Horizont */
+    translate: -50% 0;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #ffef7a 0%, #ffb340 35%, #ff4f8b 65%, #c21aa8 100%);
+    /* obere Hälfte voll, untere Hälfte in Streifen */
+    -webkit-mask-image: linear-gradient(#000 52%, transparent 52%), repeating-linear-gradient(to bottom, #000 0 14px, transparent 14px 21px);
+    mask-image: linear-gradient(#000 52%, transparent 52%), repeating-linear-gradient(to bottom, #000 0 14px, transparent 14px 21px);
+    filter: drop-shadow(0 0 30px rgba(255, 79, 139, .55));
+  }
+  .berge {
+    position: absolute; left: 0; right: 0;
+    top: calc(var(--horizont) - 13vh); height: 13vh;
+    background: linear-gradient(to bottom, #3b0f5c, #1a0530);
+    clip-path: polygon(0 100%, 0 55%, 7% 30%, 14% 62%, 22% 18%, 31% 70%, 38% 48%, 44% 100%, 56% 100%, 62% 52%, 69% 74%, 77% 22%, 85% 60%, 92% 34%, 100% 58%, 100% 100%);
+  }
+  .gitter {
+    position: absolute; left: -60%; right: -60%;
+    top: var(--horizont); height: 70%;
+    background-color: #12021f;
+    background-image:
+      linear-gradient(to bottom, var(--pink) 2px, transparent 2px),
+      linear-gradient(to right, var(--pink) 2px, transparent 2px);
+    background-size: 70px 70px;
+    transform-origin: 50% 0;
+    transform: perspective(240px) rotateX(62deg);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+    animation: fahren 1.4s linear infinite;
+  }
+  .szene::after {
+    content: ''; position: absolute; left: 0; right: 0;
+    top: calc(var(--horizont) - 1px); height: 2px;
+    background: var(--cyan);
+    box-shadow: 0 0 12px 2px var(--cyan), 0 0 40px 6px rgba(255, 63, 208, .5);
+  }
+  @keyframes fahren { to { background-position: 0 70px; } }
+
+  /* ---------- Oberfläche ---------- */
+  h1 {
+    margin: 0 0 4px; font-size: 40px; font-weight: 900; font-style: italic; letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(to bottom, #e9fdff 0%, #7ff0ff 46%, #ff5fd8 54%, #ffc46b 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 10px rgba(255, 63, 208, .65)) drop-shadow(0 2px 0 #2a0640);
+  }
+  .subtitle { margin: 0 0 20px; font-size: 14px; color: var(--muted); letter-spacing: .5px; text-shadow: 0 1px 4px #0b0221; }
   .controls {
     display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px;
-    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
-    padding: 4px; border-radius: 12px;
+    background: rgba(16, 4, 36, .7); border: 1px solid rgba(46, 230, 255, .35);
+    padding: 4px; border-radius: 8px;
   }
   button.level {
-    background: transparent; color: var(--text); border: none; opacity: .7;
-    padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;
-    transition: background .15s, opacity .15s;
+    background: transparent; color: var(--text); border: none; opacity: .75;
+    padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
+    transition: background .15s, opacity .15s, box-shadow .15s;
   }
-  button.level:hover { opacity: 1; background: rgba(255,255,255,.06); }
-  button.level.active { opacity: 1; background: var(--accent); color: #0d1b2a; font-weight: 600; }
+  button.level:hover { opacity: 1; background: rgba(255, 63, 208, .15); }
+  button.level.active {
+    opacity: 1; color: #fff; font-weight: 700;
+    background: linear-gradient(90deg, #ff3fd0, #8a3bff);
+    box-shadow: 0 0 14px rgba(255, 63, 208, .6);
+  }
   .card {
-    background: linear-gradient(180deg, #313844, #262b33);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 16px; padding: 14px;
-    box-shadow: 0 20px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+    background: rgba(16, 4, 36, .82);
+    border: 1px solid rgba(46, 230, 255, .55);
+    border-radius: 10px; padding: 14px;
+    box-shadow: 0 0 22px rgba(46, 230, 255, .35), 0 0 60px rgba(255, 63, 208, .2), 0 20px 50px rgba(0,0,0,.6);
     max-width: 100%;
   }
   .bar {
@@ -61,75 +122,81 @@
   }
   .bar .counter {
     display: flex; align-items: baseline; gap: 8px;
-    min-width: 96px; padding: 6px 12px; border-radius: 10px;
-    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+    min-width: 96px; padding: 6px 12px; border-radius: 6px;
+    background: rgba(46, 230, 255, .07); border: 1px solid rgba(46, 230, 255, .3);
     font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 700;
-    color: var(--text);
+    color: #bdf6ff; text-shadow: 0 0 8px rgba(46, 230, 255, .6);
   }
   .bar .counter:last-child { justify-content: flex-end; }
-  .bar .counter .label { font-size: 12px; font-weight: 600; color: #a9b4c4; }
+  .bar .counter .label { font-size: 12px; font-weight: 600; color: var(--muted); text-shadow: none; }
   #restart {
     display: grid; place-items: center;
-    width: 48px; height: 48px; padding: 0; cursor: pointer; color: #cfe6ff;
-    background: linear-gradient(180deg, #4a5361, #3a414c); border: 1px solid rgba(255,255,255,.1);
-    border-radius: 12px; box-shadow: 0 3px 0 #1c2027;
-    transition: transform .08s, box-shadow .08s;
+    width: 48px; height: 48px; padding: 0; cursor: pointer; color: var(--cyan);
+    background: rgba(46, 230, 255, .08); border: 1px solid var(--cyan);
+    border-radius: 8px; box-shadow: 0 0 12px rgba(46, 230, 255, .45), inset 0 0 10px rgba(46, 230, 255, .2);
+    transition: transform .08s, box-shadow .15s;
   }
-  #restart svg { width: 26px; height: 26px; transition: transform .3s; }
-  #restart:hover { filter: brightness(1.1); }
+  #restart svg { width: 26px; height: 26px; transition: transform .3s; filter: drop-shadow(0 0 4px var(--cyan)); }
+  #restart:hover { box-shadow: 0 0 20px rgba(46, 230, 255, .75), inset 0 0 12px rgba(46, 230, 255, .3); }
   #restart:hover svg { transform: rotate(40deg); }
-  #restart:active { transform: translateY(3px); box-shadow: 0 0 0 #1c2027; }
+  #restart:active { transform: translateY(2px); }
   .wrap { max-width: 100%; overflow-x: auto; }
   #board {
-    display: grid; gap: 2px; background: #1a1e24; padding: 6px; border-radius: 10px;
+    display: grid; gap: 2px; background: #07010f; padding: 6px; border-radius: 6px;
     width: max-content; margin: 0 auto;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,.5);
+    box-shadow: inset 0 0 12px rgba(255, 63, 208, .25);
   }
   .cell {
     width: var(--cell, 28px); height: var(--cell, 28px); display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: calc(var(--cell, 28px) * .55); border-radius: 4px; cursor: pointer;
-    background: var(--hidden);
+    font-weight: 800; font-size: calc(var(--cell, 28px) * .55); border-radius: 3px; cursor: pointer;
+    background: linear-gradient(to bottom, #4a2286, var(--hidden));
+    box-shadow: inset 0 1px 0 rgba(255, 140, 240, .35);
   }
-  .cell.hidden:hover { background: var(--hidden-hover); }
-  .cell.open { background: var(--open); cursor: default; }
-  .cell.mine-hit { background: var(--mine-bg); }
+  .cell.hidden:hover { background: var(--hidden-hover); box-shadow: inset 0 0 0 1px var(--pink); }
+  .cell.open { background: var(--open); box-shadow: none; cursor: default; }
+  .cell.mine-hit { background: var(--mine-bg); box-shadow: 0 0 12px var(--mine-bg); }
   .cell.wrong { background: var(--wrong); }
-  /* Eigene Töne in den üblichen Farbfamilien (1 blau, 2 grün, 3 rot …) */
-  .n1 { color: #2f6fc0; } .n2 { color: #3f8f2a; } .n3 { color: #c4492f; } .n4 { color: #4a3fa0; }
-  .n5 { color: #9a3566; } .n6 { color: #23877c; } .n7 { color: #3b352a; } .n8 { color: #7d7466; }
-  #msg { margin-top: 16px; font-size: 18px; font-weight: 600; min-height: 28px; text-align: center; }
-  #msg.win { color: #7ee2a8; }
-  #msg.lose { color: #ff8a80; }
+  /* Neon-Töne in den üblichen Farbfamilien (1 blau, 2 grün, 3 rot …) */
+  .n1 { color: #36c8ff; } .n2 { color: #4dff9a; } .n3 { color: #ff4f7b; } .n4 { color: #a98bff; }
+  .n5 { color: #ff8a3d; } .n6 { color: #3ff0d8; } .n7 { color: #f4ecff; } .n8 { color: #9b8fc0; }
+  .cell.open[class*=" n"] { text-shadow: 0 0 6px currentColor; }
+  #msg { margin-top: 16px; font-size: 18px; font-weight: 700; min-height: 28px; text-align: center; letter-spacing: .5px; }
+  #msg.win { color: #4dff9a; text-shadow: 0 0 10px rgba(77, 255, 154, .6); }
+  #msg.lose { color: #ff4f9a; text-shadow: 0 0 10px rgba(255, 79, 154, .6); }
   .help {
     margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
     max-width: 560px; font-size: 13px;
   }
   .help span {
-    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-    padding: 5px 10px; border-radius: 999px; opacity: .8;
+    background: rgba(16, 4, 36, .75); border: 1px solid rgba(255, 63, 208, .35);
+    padding: 5px 10px; border-radius: 999px;
   }
-  .help b { color: var(--accent); font-weight: 600; }
+  .help b { color: var(--cyan); font-weight: 600; }
   .custom {
     display: none; gap: 10px; align-items: center; margin-bottom: 16px; font-size: 14px;
     flex-wrap: wrap; justify-content: center;
-    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
-    padding: 8px 12px; border-radius: 12px;
+    background: rgba(16, 4, 36, .75); border: 1px solid rgba(46, 230, 255, .35);
+    padding: 8px 12px; border-radius: 8px;
   }
   .custom.show { display: flex; }
-  .custom label { display: flex; align-items: center; gap: 6px; opacity: .85; }
+  .custom label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
   .custom input {
-    width: 64px; background: #12151a; color: var(--text); border: 1px solid rgba(255,255,255,.12);
-    border-radius: 6px; padding: 5px 6px; font-size: 14px;
+    width: 64px; background: #0b0221; color: var(--text); border: 1px solid rgba(255, 63, 208, .45);
+    border-radius: 4px; padding: 5px 6px; font-size: 14px;
   }
-  .custom input:focus { outline: none; border-color: var(--accent); }
-  .custom #customStart { background: var(--accent); color: #0d1b2a; opacity: 1; font-weight: 600; }
+  .custom input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 8px rgba(46, 230, 255, .5); }
+  .custom #customStart { background: linear-gradient(90deg, #ff3fd0, #8a3bff); color: #fff; opacity: 1; font-weight: 700; }
   body.compact { padding-top: 12px; padding-bottom: 12px; }
   body.compact .subtitle, body.compact .help { display: none; }
   body.compact h1 { margin-bottom: 10px; }
   body.compact #msg { margin-top: 10px; }
+  @media (prefers-reduced-motion: reduce) {
+    .gitter { animation: none; }
+  }
 </style>
 </head>
 <body>
+<div class="szene" aria-hidden="true"><div class="sonne"></div><div class="berge"></div><div class="gitter"></div></div>
 <h1>Many Mines</h1>
 <p class="subtitle">Finde alle Minen, ohne eine zu treffen.</p>
 
@@ -347,7 +414,7 @@
     stopTimer();
     msgEl.textContent = 'Boom! Verloren. Klick auf ↻ für ein neues Spiel.';
     msgEl.className = 'lose';
-    cells.forEach((c, i) => {
+    cells.forEach(c => {
       if (c.mine && c.state !== 'flag') {
         c.el.className = 'cell open';
         c.el.textContent = '💣';

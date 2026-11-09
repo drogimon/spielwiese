@@ -232,10 +232,65 @@ addEventListener('message', ereignis => {
   if (daten?.typ === 'spielwiese:ergebnis') ergebnisMelden(offenesSpiel, daten);
 });
 
+// ---------- Version und Updates (nur in der App, nicht in der Browser-Vorschau) ----------
+
+const tauri = window.__TAURI__;
+
+async function versionAnzeigen() {
+  if (!tauri?.app) return;
+  document.getElementById('version').textContent = `v${await tauri.app.getVersion()}`;
+}
+
+async function updatePruefen() {
+  if (!tauri?.updater) return;
+  let update;
+  try {
+    update = await tauri.updater.check();
+  } catch (fehler) {
+    // offline oder noch kein Release – kein Grund, den Spielspaß zu stören
+    console.warn('Update-Prüfung fehlgeschlagen', fehler);
+    return;
+  }
+  if (!update) return;
+
+  const kasten = document.getElementById('update');
+  const text = document.getElementById('update-text');
+  const ja = document.getElementById('update-ja');
+  const spaeter = document.getElementById('update-spaeter');
+  text.textContent = `📬 Neue Version ${update.version} ist da!`;
+  kasten.hidden = false;
+
+  spaeter.onclick = () => { kasten.hidden = true; };
+  ja.onclick = async () => {
+    ja.disabled = spaeter.disabled = true;
+    let gesamt = 0, geladen = 0;
+    try {
+      await update.downloadAndInstall(ereignis => {
+        if (ereignis.event === 'Started') gesamt = ereignis.data.contentLength ?? 0;
+        if (ereignis.event === 'Progress') {
+          geladen += ereignis.data.chunkLength;
+          text.textContent = gesamt
+            ? `Lade Version ${update.version} … ${Math.round(geladen / gesamt * 100)} %`
+            : `Lade Version ${update.version} …`;
+        }
+        if (ereignis.event === 'Finished') text.textContent = 'Wird installiert …';
+      });
+      await tauri.process.relaunch();
+    } catch (fehler) {
+      console.error('Update fehlgeschlagen', fehler);
+      text.textContent = 'Das Update hat nicht geklappt. Später nochmal versuchen?';
+      ja.disabled = spaeter.disabled = false;
+    }
+  };
+}
+
+versionAnzeigen();
+setTimeout(updatePruefen, 3000);
+
 // ---------- Tastatur ----------
 
 async function vollbildUmschalten() {
-  const fenster = window.__TAURI__?.window?.getCurrentWindow();
+  const fenster = tauri?.window?.getCurrentWindow();
   if (fenster) {
     await fenster.setFullscreen(!(await fenster.isFullscreen()));
   } else if (document.fullscreenElement) {
