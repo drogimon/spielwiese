@@ -1,0 +1,51 @@
+# Baut bei jedem Versions-Tag (z. B. v0.1.1) den Windows-Installer,
+# signiert ihn für Auto-Updates und veröffentlicht ihn als GitHub Release.
+# Die App holt sich später die Datei latest.json aus dem neuesten Release.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versionsnummer prüfen (Tag muss zu tauri.conf.json passen)
+        shell: bash
+        run: |
+          conf=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          if [ "v$conf" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME passt nicht zur Version $conf in tauri.conf.json"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ''
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Spielwiese ${{ github.ref_name }}
+          releaseBody: Installer herunterladen (Spielwiese_…_x64-setup.exe) und ausführen. Bereits installierte Versionen aktualisieren sich von selbst.
+          releaseDraft: false
+          prerelease: false
